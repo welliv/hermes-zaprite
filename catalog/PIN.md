@@ -10,7 +10,7 @@
 | docs_url | https://github.com/welliv/hermes-zaprite |
 | homepage | https://github.com/welliv/hermes-zaprite |
 | maintainer | welliv |
-| sha | `fce5412810d8ba4913dbcb42a65fcab8673db74e` |
+| sha | `f956483d6f523cc4fc4f8901d79a4cdd51022a6e` |
 
 `sha` is `git rev-parse HEAD` of the commit that landed this tree on `main`. Hermes checks out that commit. It is not this pin commit. `version: "0.1.0"` matches `plugin.yaml` on that tree commit. Catalog install clones this GitHub repository, so the repository will be public before that install. This pin does not publish it.
 
