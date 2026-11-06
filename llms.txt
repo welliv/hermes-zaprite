@@ -1,0 +1,52 @@
+# Zaprite for Hermes
+
+Receive money on Zaprite from an agent. One `checkoutUrl` for card, bank, Lightning, on-chain bitcoin, and stablecoins the org has already connected. Re-fetch until Paid. Do not trust a webhook body.
+
+## When to use
+
+- Invoice or one-amount checkout, then hand over `checkoutUrl`.
+- Watch an order until Paid and mark it complete after delivery.
+- Lightning or on-chain quote (`paymentUrl`) for the same order.
+- Overdue invoices, a first-page report, a saved-profile charge the person approved.
+- Check in a ticket for an event that already exists.
+
+## When not to use
+
+- The agent is paying. This plugin receives.
+- Creating an org, an API key, a rail, a checkout, a payment link, a recurring invoice, an event, or a refund. Those writes are not in the API. Listing an existing payment link is fine.
+- Treating `{eventType, orderId, orgId}` as payment. It is unsigned and id-only. `GET /v1/orders/{id}`.
+
+## How to call
+
+Hermes, first:
+
+```bash
+hermes plugins install "$PWD" --yes-deps
+hermes plugins enable zaprite
+```
+
+Tools are `zaprite_*`. Secret `ZAPRITE_API_KEY` comes from Hermes (`agent.secret_scope.get_secret`), created at https://app.zaprite.com/org/default/settings/api
+
+Outside Hermes: `Authorization: Bearer` to `https://api.zaprite.com/v1`. See AGENTS.md. There is no MCP server in this version.
+
+## Read next
+
+- [Install and disclosures](README.md)
+- [Agent setup prompt](prompt.md)
+- [Human setup](setup.md)
+- [Skill: get paid (context-first)](skills/zaprite/SKILL.md)
+- [Skill: checkout / website wizard](skills/zaprite-checkout-wizard/SKILL.md)
+- [Skill: 10s open-rail closer](skills/zaprite-sovereign/SKILL.md)
+- [Integrators](AGENTS.md)
+- [90s demo](DEMO.md)
+- [Paid loop example (tools + sample JSON)](examples/paid-loop.md)
+- [API gaps — do not invent these](docs/api-gaps.md)
+- [Catalog draft](catalog/zaprite.yaml)
+- [How to pin the catalog SHA](catalog/PIN.md)
+
+## Upstream
+
+- [Zaprite OpenAPI](https://api.zaprite.com/openapi.json)
+- [Zaprite API docs for agents](https://api.zaprite.com/llms.txt)
+- [Hermes plugin guide](https://hermes-agent.nousresearch.com/docs/developer-guide/plugins)
+- [Status](https://status.zaprite.com)

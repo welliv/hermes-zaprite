@@ -1,0 +1,58 @@
+name: Bug report
+description: Something the plugin did that it should not have done
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste an API key, a checkout URL containing a paid order, or customer data.
+        For anything credential-shaped, use SECURITY.md instead.
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version or commit
+      placeholder: "0.1.0 / 708cf08"
+    validations:
+      required: true
+  - type: input
+    id: hermes
+    attributes:
+      label: Hermes version
+      description: Output of `hermes --version`
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options:
+        - A tool call (which one?)
+        - Approval or cron behaviour
+        - Doctor / setup
+        - Install or validation
+        - Docs
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Include the tool output with secrets removed.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. /zaprite doctor
+        2. "invoice Acme $500"
+        3. ...
+    validations:
+      required: true

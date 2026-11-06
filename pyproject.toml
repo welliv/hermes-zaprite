@@ -1,0 +1,23 @@
+[project]
+name = "zaprite"
+version = "0.1.0"
+description = "Hermes plugin: get paid on Zaprite across card, bank, Lightning, on-chain bitcoin, and stablecoins."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "httpx>=0.27,<0.29",
+]
+
+[build-system]
+requires = ["setuptools>=68,<81"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["zaprite_core"]
+py-modules = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = ["--import-mode=importlib"]

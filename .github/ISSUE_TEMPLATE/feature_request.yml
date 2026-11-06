@@ -1,0 +1,29 @@
+name: Feature request
+description: A tool, rail, or workflow the plugin should support
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the merchant task, not the implementation.
+    validations:
+      required: true
+  - type: input
+    id: api
+    attributes:
+      label: Is this in Zaprite's public API?
+      description: Link the operation from https://api.zaprite.com, or say "not in the API".
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What do you do today instead?
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This can move money or change an account, so it needs approval gating.
+        - label: This is read-only.

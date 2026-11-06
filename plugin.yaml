@@ -1,0 +1,83 @@
+name: zaprite
+version: 0.1.0
+description: Get paid from a Hermes chat. Context first (key, test vs live, connections), then one checkoutUrl for card, bank, Lightning, on-chain bitcoin, and stablecoins; re-fetch until Paid.
+manifest_version: 2
+api_version: 1
+requires_hermes: ">=0.21.0"
+license: MIT
+homepage: https://github.com/welliv/zaprite-hermes
+tags:
+  - payments
+  - bitcoin
+  - lightning
+  - merchant
+  - zaprite
+provides_tools:
+  - zaprite_pay
+  - zaprite_create_order
+  - zaprite_create_invoice
+  - zaprite_get_order
+  - zaprite_list_orders
+  - zaprite_create_quote
+  - zaprite_watch_order
+  - zaprite_update_order
+  - zaprite_charge_profile
+  - zaprite_create_contact
+  - zaprite_get_contact
+  - zaprite_list_contacts
+  - zaprite_update_contact
+  - zaprite_delete_contact
+  - zaprite_report
+  - zaprite_list_overdue
+  - zaprite_doctor
+  - zaprite_setup
+  - zaprite_list_webhooks
+  - zaprite_create_webhook
+  - zaprite_delete_webhook
+  - zaprite_bridge_handoff
+  - zaprite_sovereign_rails
+  - zaprite_list_payment_links
+  - zaprite_get_payment_link
+  - zaprite_list_tickets
+  - zaprite_get_ticket
+  - zaprite_issue_tickets
+  - zaprite_ticket_activity
+# pre_tool_call may return {"action": "approve"} with a one-time rule_key.
+# That escalates to the Hermes human approval gate. It does not grant the call.
+# post_approval_response records a fresh human yes. The handler sends nothing
+# without that record. Unattended cron and /zaprite kill are "block".
+provides_hooks:
+  - pre_tool_call
+  - post_approval_response
+requires_env:
+  - name: ZAPRITE_API_KEY
+    description: Zaprite organization API key. Full access to get paid, or read-only for reports.
+    url: https://app.zaprite.com/org/default/settings/api
+    secret: true
+python_dependencies:
+  - "httpx>=0.27,<0.29"
+config_schema:
+  base_url:
+    type: str
+    default: "https://api.zaprite.com"
+    label: API base URL
+    description: Zaprite API origin. Paths are under /v1. Use https only.
+  spend_limit_cents:
+    type: int
+    default: 0
+    label: Spend limit (cents for USD, sats for BTC)
+    description: >
+      One integer ceiling, compared with the order total in that order's
+      smallest unit. USD: cents (50000 = 500.00 USD). BTC and LBTC: sats
+      (50000 = 50000 sats, not 500 dollars). Other fiat: that currency's
+      smallest unit. 0 disables the cap. The name says cents because USD is
+      the common case. It is not a dollar cap on bitcoin. Orders above the
+      cap are refused before the request is sent. Hermes approval still applies.
+  notify:
+    type: str
+    default: session
+    choices: [session, silent]
+    label: Paid notification
+    description: >
+      session puts a spoken Paid line in the active Hermes chat. silent returns
+      the data without that line. Telegram is never required.

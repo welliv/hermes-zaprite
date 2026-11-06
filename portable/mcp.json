@@ -1,0 +1,4 @@
+{
+  "mcpServers": {},
+  "notes": "Intentionally empty. There is no stdio or remote MCP server in 0.1.0. Install the native Hermes plugin and use the zaprite_* tools. Do not put an API key in this file."
+}

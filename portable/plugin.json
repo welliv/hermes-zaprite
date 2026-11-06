@@ -1,0 +1,6 @@
+{
+  "name": "zaprite",
+  "version": "0.1.0",
+  "description": "Stub only. Zaprite 0.1.0 ships as a native Hermes plugin (plugin.yaml + register). Do not enable this directory as a portable package.",
+  "skills": "../skills"
+}
