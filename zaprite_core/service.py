@@ -18,6 +18,7 @@ from .constants import (
     INVOICE_EMAIL_NOTE,
     LINKS,
     ORG_SLUG_NOTE,
+    ORDER_DONE,
     OVERDUE_MAX_PAGES,
     RAILS_NOTE,
     SIGN_IN_URL,
@@ -525,6 +526,11 @@ def get_order(args: dict, **kwargs: Any) -> dict:
         payload["warning"] = (
             "Paid more than the total. Zaprite has no refund API — refund the difference yourself."
         )
+    if not is_paid(order) and str(order.get("status") or "").upper() in ORDER_DONE:
+        payload["warning"] = (
+            "COMPLETE means the work is done, not that money arrived. "
+            "Payment truth is a PAID or OVERPAID status."
+        )
     if is_paid(order):
         payload["session_notice"] = _notice(paid_notice(view))
         payload["next"] = "Deliver the work, then zaprite_update_order with status COMPLETE."
@@ -736,7 +742,7 @@ def update_order(args: dict, **kwargs: Any) -> dict:
         "ok": True,
         "order": view,
         "session_notice": _notice(notice),
-        "note": "PATCH only sets COMPLETE, PAID, or expiresAt. It does not refund, void an invoice, or edit line items.",
+        "note": "PATCH only sets COMPLETE or expiresAt. It cannot set PAID. It does not refund, void an invoice, or edit line items.",
     }
     payload.update(_session(kwargs))
     return payload
@@ -930,7 +936,8 @@ def report(args: dict, **kwargs: Any) -> dict:
             bucket[currency] = bucket.get(currency, 0) + amount
         if len(recent) < 8:
             recent.append(order_view(order))
-    paid = sum(counts.get(name, 0) for name in ("PAID", "OVERPAID", "COMPLETE"))
+    paid = sum(counts.get(name, 0) for name in ("PAID", "OVERPAID"))
+    completed = sum(counts.get(name, 0) for name in ("COMPLETE",))
     return {
         "ok": True,
         "by_status": counts,
@@ -938,10 +945,11 @@ def report(args: dict, **kwargs: Any) -> dict:
         "owed": owed,
         "open_links": open_links,
         "paid_on_this_page": paid,
+        "completed_on_this_page": completed,
         "recent": recent,
         "meta": data.get("meta") if isinstance(data, dict) else None,
         "local_orders_tracked": store.count_orders(),
-        "note": "This is the first page of orders, not an accounting export. Zaprite has no reports API. Pending is included unless you set include_pending to false.",
+        "note": "First page of orders, not an accounting export. Zaprite has no reports API. Pending is included unless you set include_pending to false. Paid counts PAID and OVERPAID only; COMPLETE means work done, not money.",
     }
 
 

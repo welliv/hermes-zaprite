@@ -24,7 +24,9 @@ WATCH_MIN_INTERVAL = 2
 WATCH_MAX_POLLS = 40
 OVERDUE_MAX_PAGES = 3
 
-ORDER_PAID = frozenset({"PAID", "OVERPAID", "COMPLETE"})
+# Money arrived. COMPLETE is not here on purpose: it means work done, not cash.
+ORDER_PAID = frozenset({"PAID", "OVERPAID"})
+ORDER_DONE = frozenset({"COMPLETE"})
 INVOICE_PAID = frozenset({"PAID", "OVERPAID"})
 INVOICE_OPEN = frozenset({"DRAFT", "SENT", "OVERDUE", "UNDERPAID"})
 

@@ -153,7 +153,9 @@ def test_report_counts_statuses():
     body = _loads(HANDLERS["zaprite_report"]({}))
     assert body["by_status"]["PAID"] == 1
     assert body["by_status"]["COMPLETE"] == 1
-    assert body["paid_on_this_page"] == 2
+    # COMPLETE is work done, not money. It used to count as paid; that was the bug.
+    assert body["paid_on_this_page"] == 1
+    assert body["completed_on_this_page"] == 1
 
 
 

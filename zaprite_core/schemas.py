@@ -239,7 +239,7 @@ SCHEMAS = {
     "zaprite_watch_order": _tool(
         "zaprite_watch_order",
         (
-            "Re-fetch an order until it is PAID, OVERPAID, or COMPLETE, or until timeout_seconds "
+            "Re-fetch an order until money arrives (PAID or OVERPAID), or until timeout_seconds "
             "(default 25, max 90). This is a poll, not a webhook listener. Say session_notice to the "
             "user in this chat when it returns. Telegram is not required. Read-only. "
             "Call again to keep waiting. Unsigned webhook ids are never treated as payment."
