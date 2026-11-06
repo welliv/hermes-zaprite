@@ -19,7 +19,7 @@ Complete the plugin install yourself. The person only creates the org, connects 
 From a clone or the release-tree pin (`requires_hermes` `>=0.21.0`). The ref is the 40-character sha in `catalog/zaprite.yaml`, the commit that landed the plugin tree, not a later pin-edit commit. Add `--force` to replace an install that is already there.
 
 ```bash
-hermes plugins install welliv/hermes-zaprite --ref 468854810f704dc83926db8adf39c8bd51b6eb63 --yes-deps --enable
+hermes plugins install welliv/hermes-zaprite --ref 524ce9fd3df4f9f015b6b940407e6460b4770297 --yes-deps --enable
 ```
 
 Or from this directory while developing:
