@@ -935,7 +935,13 @@ def report(args: dict, **kwargs: Any) -> dict:
             bucket = owed if kind in {"invoice", "apiInvoice"} else open_links
             bucket[currency] = bucket.get(currency, 0) + amount
         if len(recent) < 8:
-            recent.append(order_view(order))
+            item = order_view(order)
+            # Say which of the two facts each row is. A model reading a bare
+            # "COMPLETE" has already called it paid once in a live session.
+            item["paid"] = is_paid(order)
+            if not item["paid"] and str(order.get("status") or "").upper() in ORDER_DONE:
+                item["money"] = "not paid — work marked done"
+            recent.append(item)
     paid = sum(counts.get(name, 0) for name in ("PAID", "OVERPAID"))
     completed = sum(counts.get(name, 0) for name in ("COMPLETE",))
     return {

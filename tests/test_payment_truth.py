@@ -77,3 +77,18 @@ def test_marking_complete_then_watching_still_reports_unpaid():
     runtime.monotonic = lambda: 2_000_000.0
     watched = json.loads(HANDLERS["zaprite_watch_order"]({"order_id": "od_1", "timeout_seconds": 1}))
     assert watched["paid"] is False
+
+
+def test_report_rows_say_whether_money_arrived():
+    router = Router()
+    router.add("GET", "/v1/orders", lambda _r: (200, {"items": [
+        order(id="done", status="COMPLETE"),
+        order(id="paid", status="PAID"),
+    ]}))
+    use_router(router)
+    body = json.loads(HANDLERS["zaprite_report"]({}))
+    rows = {row["id"]: row for row in body["recent"]}
+    assert rows["done"]["paid"] is False
+    assert "not paid" in rows["done"]["money"]
+    assert rows["paid"]["paid"] is True
+    assert "money" not in rows["paid"]
