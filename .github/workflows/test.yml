@@ -1,0 +1,44 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install pinned ranges
+        run: pip install "httpx>=0.27,<0.29" "pytest>=8.2,<10"
+      - name: Test
+        run: pytest -q
+
+  no-network:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned ranges
+        run: pip install "httpx>=0.27,<0.29" "pytest>=8.2,<10"
+      - name: The suite must pass with no outbound network
+        run: |
+          python - <<'PY'
+          import socket, sys, pytest
+          class Blocked(socket.socket):
+              def connect(self, *a, **k):
+                  raise AssertionError("a test tried to reach the network")
+              def connect_ex(self, *a, **k):
+                  raise AssertionError("a test tried to reach the network")
+          socket.socket = Blocked
+          sys.exit(pytest.main(["-q"]))
+          PY

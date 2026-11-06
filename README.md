@@ -30,13 +30,13 @@ The Paid loop below is the path. Tickets and the open-rail closer stay later in 
 Hermes `>=0.21.0`. Preferred, from the release-tree commit (the 40-character sha in `catalog/zaprite.yaml`, not a later commit that only edits the pin):
 
 ```bash
-hermes plugins install welliv/zaprite-hermes --ref 907ff3df71447c187eb7566b9666c5751842e26c --yes-deps --enable
+hermes plugins install welliv/zaprite-hermes --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable
 ```
 
 Add `--force` when replacing a copy that is already installed:
 
 ```bash
-hermes plugins install welliv/zaprite-hermes --ref 907ff3df71447c187eb7566b9666c5751842e26c --yes-deps --enable --force
+hermes plugins install welliv/zaprite-hermes --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable --force
 ```
 
 From a local checkout while developing:
@@ -165,7 +165,7 @@ hermes plugins doctor . --ci
 
 ## Catalog
 
-`catalog/zaprite.yaml` is the entry for `NousResearch/hermes-agent` `plugin-catalog/zaprite.yaml`. `repo`, `docs_url`, and the manifest homepage are `https://github.com/welliv/zaprite-hermes`. `sha` is `907ff3df71447c187eb7566b9666c5751842e26c`, the commit that landed this tree on `main`. `requires_hermes` is `>=0.21.0`. Instructions are in `catalog/PIN.md`.
+`catalog/zaprite.yaml` is the entry for `NousResearch/hermes-agent` `plugin-catalog/zaprite.yaml`. `repo`, `docs_url`, and the manifest homepage are `https://github.com/welliv/hermes-zaprite`. `sha` is `af7b7554b1fa8b25827af5ba9d242d737094a2a8`, the commit that landed this tree on `main`. `requires_hermes` is `>=0.21.0`. Instructions are in `catalog/PIN.md`.
 
 ## Known gaps
 
@@ -211,4 +211,4 @@ docs/api-gaps.md            writes that do not exist — do not invent them
 
 ## License
 
-MIT. Homepage: https://github.com/welliv/zaprite-hermes. Maintainer: welliv.
+MIT. Homepage: https://github.com/welliv/hermes-zaprite. Maintainer: welliv.
