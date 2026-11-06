@@ -92,3 +92,29 @@ def test_report_rows_say_whether_money_arrived():
     assert "not paid" in rows["done"]["money"]
     assert rows["paid"]["paid"] is True
     assert "money" not in rows["paid"]
+
+
+def _settled(total=100, amount=100, status="CONFIRMED"):
+    return {"status": "COMPLETE", "totalAmount": total, "paidAt": "2026-11-06T10:59:22Z",
+            "transactions": [{"amountInOrderCurrency": amount, "status": status, "method": "BITCOIN"}]}
+
+
+def test_complete_with_a_settled_transaction_is_paid():
+    # Zaprite marks a settled order COMPLETE; the money is in the transaction list.
+    assert is_paid(_settled()) is True
+
+
+def test_a_partial_payment_is_not_paid():
+    assert is_paid(_settled(total=100, amount=50)) is False
+
+
+def test_an_unconfirmed_transaction_is_not_paid():
+    assert is_paid(_settled(status="PENDING")) is False
+
+
+def test_watch_stops_on_a_complete_order_that_was_paid():
+    router = Router()
+    router.add("GET", "/v1/orders/od_paid", lambda _r: (200, _settled()))
+    use_router(router)
+    body = json.loads(HANDLERS["zaprite_watch_order"]({"order_id": "od_paid", "timeout_seconds": 5}))
+    assert body["paid"] is True

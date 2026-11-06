@@ -60,11 +60,52 @@ def order_view(order: dict) -> dict[str, Any]:
     }
 
 
+SETTLED = frozenset({"CONFIRMED", "SETTLED", "COMPLETE"})
+
+
+def settled_amount(order: dict) -> int:
+    """Money received, in the order's currency, from transactions Zaprite settled."""
+    total = 0
+    for txn in order.get("transactions") or []:
+        if not isinstance(txn, dict):
+            continue
+        if str(txn.get("status") or "").upper() not in SETTLED:
+            continue
+        amount = txn.get("amountInOrderCurrency")
+        if amount is None:
+            amount = txn.get("amount")
+        try:
+            total += int(amount or 0)
+        except (TypeError, ValueError):
+            continue
+    return total
+
+
 def is_paid(order: dict) -> bool:
+    """True only when Zaprite says money arrived.
+
+    Two shapes, both observed live in the sandbox:
+
+      status PAID / OVERPAID            -> paid
+      status COMPLETE + a confirmed txn -> paid, because Zaprite marks a
+                                           settled order COMPLETE
+
+    COMPLETE with no settled transaction is delivery, not payment.
+    """
     view = order if "invoice_status" in order else order_view(order)
     if view.get("status") in ORDER_PAID:
         return True
     if view.get("invoice_status") in INVOICE_PAID:
+        return True
+    settled = settled_amount(order)
+    try:
+        total = int(order.get("totalAmount") or 0)
+    except (TypeError, ValueError):
+        total = 0
+    # Money counts only when it covers the total: a partial payment is not paid.
+    if settled and (total <= 0 or settled >= total):
+        return True
+    if not order.get("transactions") and order.get("paidAt"):
         return True
     return False
 

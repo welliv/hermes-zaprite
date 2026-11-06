@@ -118,7 +118,10 @@ def test_watch_refetches_until_paid_and_discloses_unsigned_webhooks():
     router = Router()
 
     def fetched(_request):
-        return 200, order(status=next(states), paidAt="2026-11-05T12:00:00Z")
+        status = next(states)
+        # Zaprite stamps paidAt only when money arrived; a PENDING order with a
+        # payment timestamp is not a thing, and this fixture used to assert one.
+        return 200, order(status=status, paidAt="2026-11-05T12:00:00Z" if status == "PAID" else None)
 
     router.add("GET", "/v1/orders/od_123", fetched)
     use_router(router)

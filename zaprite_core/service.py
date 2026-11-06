@@ -958,7 +958,8 @@ def report(args: dict, **kwargs: Any) -> dict:
             if not item["paid"] and str(order.get("status") or "").upper() in ORDER_DONE:
                 item["money"] = "not paid — work marked done"
             recent.append(item)
-    paid = sum(counts.get(name, 0) for name in ("PAID", "OVERPAID"))
+    # Zaprite marks a paid order COMPLETE, so status alone cannot count money.
+    paid = sum(1 for o in (items or []) if isinstance(o, dict) and is_paid(o))
     completed = sum(counts.get(name, 0) for name in ("COMPLETE",))
     return {
         "ok": True,
