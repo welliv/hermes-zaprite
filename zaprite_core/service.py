@@ -333,7 +333,7 @@ def pay(args: dict, **kwargs: Any) -> dict:
                 "An invoice needs a customer. Give me a name and email, or use as='order' "
                 "for a link anyone can pay."
             )
-        item = {"name": str(description), "unit_price": amount}
+        item = {"name": str(description), "unit_price": amount, "quantity": 1}
         invoice_args: dict[str, Any] = {
             "contact_id": contact_id,
             "currency": currency,
@@ -348,8 +348,24 @@ def pay(args: dict, **kwargs: Any) -> dict:
     if not made.get("ok"):
         return made
 
-    url = made.get("checkoutUrl")
     view = made.get("order") or {}
+    actual = int(view.get("totalAmount") or 0)
+    if actual != amount:
+        # Never hand over a link that charges a different number than the one asked for.
+        return {
+            "ok": False,
+            "error": {
+                "code": "AMOUNT_MISMATCH",
+                "message": (
+                    f"Zaprite made a payment for {format_amount(actual, currency)}, not {phrase}. "
+                    f"Order {view.get('id')} exists, so fix or void it in the dashboard. No link returned."
+                ),
+                "issues": [],
+            },
+            "order": view,
+        }
+
+    url = made.get("checkoutUrl")
     who = name or email or ""
     noun = "Order" if kind == "order" else "Invoice"
     summary = f"{noun} for {phrase}" + (f" to {who}" if who else "") + f" — {url}"

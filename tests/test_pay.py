@@ -80,7 +80,7 @@ def test_pay_without_a_wire_is_refused_before_any_call():
 
 def test_pay_as_an_open_link_needs_no_customer():
     router = Router()
-    router.add("POST", "/v1/orders", lambda _r: (201, order(id="od_open", status="PENDING", checkoutUrl="https://pay.zaprite.com/order/od_open")))
+    router.add("POST", "/v1/orders", lambda _r: (201, order(id="od_open", status="PENDING", totalAmount=7500, checkoutUrl="https://pay.zaprite.com/order/od_open")))
     use_router(router)
     store.set_meta("rails_state", "skipped")
     args = {"description": "Workshop seat", "amount": "75", "as": "order"}
@@ -148,3 +148,30 @@ def test_pay_fails_closed_when_nobody_can_approve():
         assert policy.pending_count() == 0
     finally:
         runtime.ctx = None
+
+
+def test_the_invoice_line_says_quantity_one():
+    router = Router()
+    router.add("POST", "/v1/contacts", lambda _r: (201, {"id": "c_1", "legalName": "Dana", "email": "d@x.com"}))
+    router.add("POST", "/v1/orders", lambda _r: (201, order(id="od_q", totalAmount=125, checkoutUrl="https://pay.zaprite.com/order/od_q")))
+    use_router(router)
+    store.set_meta("rails_state", "skipped")
+    args = {"description": "Seat", "amount": "$1.25", "customer": {"name": "Dana", "email": "d@x.com"}}
+    allow("zaprite_pay", args)
+    assert json.loads(HANDLERS["zaprite_pay"](args))["ok"] is True
+    body = router.json_bodies("POST", "/v1/orders")[0]
+    assert body["invoice"]["lineItems"][0]["quantity"] == 1
+
+
+def test_a_wrong_total_returns_no_link():
+    router = Router()
+    router.add("POST", "/v1/orders", lambda _r: (201, order(id="od_bad", totalAmount=100, checkoutUrl="https://pay.zaprite.com/order/od_bad")))
+    use_router(router)
+    store.set_meta("rails_state", "skipped")
+    args = {"description": "Seat", "amount": "$1.25", "as": "order"}
+    allow("zaprite_pay", args)
+    body = json.loads(HANDLERS["zaprite_pay"](args))
+    assert body["ok"] is False
+    assert body["error"]["code"] == "AMOUNT_MISMATCH"
+    assert "checkoutUrl" not in body
+    assert "1.00" in body["error"]["message"] and "1.25" in body["error"]["message"]
