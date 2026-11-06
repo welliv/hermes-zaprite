@@ -5,7 +5,7 @@ manifest_version: 2
 api_version: 1
 requires_hermes: ">=0.21.0"
 license: MIT
-homepage: https://github.com/welliv/zaprite-hermes
+homepage: https://github.com/welliv/hermes-zaprite
 tags:
   - payments
   - bitcoin

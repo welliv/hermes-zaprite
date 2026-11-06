@@ -5,7 +5,7 @@ This plugin holds a credential that can create real payment orders. Treat a susp
 ## Report privately
 
 Do **not** open a public issue. Email the maintainer at the address on the GitHub profile, or use
-GitHub's [private vulnerability reporting](https://github.com/welliv/zaprite-hermes/security/advisories/new).
+GitHub's [private vulnerability reporting](https://github.com/welliv/hermes-zaprite/security/advisories/new).
 
 Include:
 

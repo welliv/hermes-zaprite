@@ -1,14 +1,16 @@
-# Zaprite for Hermes
+# Zaprite for Hermes — every rail, one agent
 
-You type "Invoice Northwind 1,280 dollars. Card, bank, Lightning, or on-chain bitcoin." Hermes returns one `checkoutUrl`. The payer opens it and pays on whichever of those rails this org already connected. Hermes re-fetches the order and says **Paid** in this chat, then marks the work complete. No dashboard. Telegram is not required. Zaprite hosts checkout and does not hold the funds.
+You say the merchant job. Hermes becomes the soft keyboard: tools for *this* payment, not another dashboard screen.
 
-Hermes is the device in the merchant's hand. Zaprite is where the rails they already hired live: card, bank, Lightning, on-chain bitcoin, and stablecoins, on that one checkout.
+> Invoice Northwind 1,280 dollars — card, bank, Lightning, or on-chain bitcoin.
 
-## Before any real payment
+One `checkoutUrl`. The payer chooses among rails this org already connected — including stablecoins when those are connected. Hermes re-fetches until **Paid** in this chat. Zaprite hosts checkout and does not hold the funds.
 
-- **Sandbox first.** A sandbox organization takes test payments and moves no real money. A live organization opens real checkouts. The plugin cannot switch orgs for you: paste the key for the org you mean. https://help.zaprite.com/en/articles/9987875-what-is-a-sandbox-environment · https://help.zaprite.com/en/articles/9875022-how-to-test-payments-for-an-api-integration
-- **Unsigned webhooks.** A delivery is ids only, `{eventType, orderId, orgId}`, and it has no signature. Re-fetch the order. A webhook is not a payment.
-- **API ceilings.** There is no API to create a recurring invoice, a payment link, a POS terminal, an event, or a refund. Logo, accent color, and display name are not an API write. A person sets them in Settings → Profile. `zaprite_bridge_handoff` with gap `branding_profile` opens that page. It does not send a logo or a color to Connections or Checkouts. The full list is [`docs/api-gaps.md`](docs/api-gaps.md).
+**Hermes is the device. Zaprite is where the rails live.**
+
+Agent-to-agent settlement is a ~10s closer. The merchant Paid loop above is the product.
+
+Below: sandbox first, unsigned webhooks, API ceilings, dual-hook approval, `/zaprite kill`.
 
 ## Quickstart
 
@@ -30,13 +32,13 @@ The Paid loop below is the path. Tickets and the open-rail closer stay later in 
 Hermes `>=0.21.0`. Preferred, from the release-tree commit (the 40-character sha in `catalog/zaprite.yaml`, not a later commit that only edits the pin):
 
 ```bash
-hermes plugins install welliv/zaprite-hermes --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable
+hermes plugins install welliv/hermes-zaprite --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable
 ```
 
 Add `--force` when replacing a copy that is already installed:
 
 ```bash
-hermes plugins install welliv/zaprite-hermes --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable --force
+hermes plugins install welliv/hermes-zaprite --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable --force
 ```
 
 From a local checkout while developing:
@@ -48,41 +50,31 @@ hermes plugins install "$PWD" --yes-deps
 hermes plugins enable zaprite
 ```
 
-Restart the session. Hermes asks for `ZAPRITE_API_KEY` (sign in or sign up at https://app.zaprite.com, create a key, paste it — not into chat). Then `/zaprite doctor` before any money or site work: it confirms the key, test vs live (which org the key belongs to), and human setup links for Connections. The plugin reads the key only with `agent.secret_scope.get_secret`.
+Restart the session. Hermes asks for the key: sign in or sign up at https://app.zaprite.com, create one, then paste it into **Hermes → Tools → Zaprite**. Never into chat. Then `/zaprite doctor` before any money or site work: it confirms the key, test vs live (which org the key belongs to), and human setup links for Connections. The plugin reads the key only with `agent.secret_scope.get_secret`.
 
-## Disclosures
+## The Paid loop
 
-What you are installing:
+1. `zaprite_doctor` if you have not checked the key.
+2. `zaprite_pay` — one call. Give it a description, the amount, and a name and email. It
+   finds or creates the customer, creates the invoice, and returns one link. Use `as="order"`
+   for a link anyone can pay.
+3. Need line items or a custom invoice? `zaprite_create_contact` (`legal_name`, `email`)
+   then `zaprite_create_invoice`.
+4. Send `checkoutUrl` to the payer. Say the `session_notice` in this chat. Telegram is not required.
+5. `zaprite_watch_order` re-fetches until `PAID`, `OVERPAID`, or `COMPLETE`, or until the timeout (default 25s, max 90s). Call it again to keep waiting.
+6. Deliver the work. `zaprite_update_order` with `status` `COMPLETE` is Mark as complete. It is not a refund.
 
-- **Network.** Calls `https://api.zaprite.com` with the org API key. User-Agent `zaprite-hermes/0.1.0`. No other host. No telemetry.
-- **Money movement.** A full-access key can open real checkouts. Customers can pay them. `zaprite_charge_profile` charges a payment profile the customer already saved.
-- **Email.** Receipts and ticket emails stay off unless you set the flag. The Zaprite API defaults receipts to on. This plugin sends `false` unless you ask.
-- **Tickets.** Issuing tickets can incur Zaprite's standard ticket fee (1% + $3 per ticket on that product).
-- **Mark complete.** `zaprite_update_order` can set `PAID` or `COMPLETE`, or an expiry. It cannot refund.
-- **Webhooks.** Payloads are id-only and unsigned (`{eventType, orderId, orgId}`). There is no signature. Every watch and get re-fetches the order and says so. This plugin does not run a webhook server. `zaprite_create_webhook` can register your own HTTPS URL; payloads stay unsigned.
-- **Local ledger.** Orders this plugin creates sit in Hermes `plugin_db("zaprite")`. The API key is not stored there.
-- **Dashboard handoff.** One URL and a note for a gap the API cannot write (a Lightning discount, or Settings → Profile for a logo and accent color). No browser, no clicking.
-- **Branding.** Logo, accent color, and display name are dashboard Profile inheritance only. API-created invoices and checkouts inherit them. This plugin cannot read or write branding.
-- **Approvals.** `pre_tool_call` may return `{"action": "approve"}` with a one-time `rule_key`. That **escalates to the Hermes human gate**. It does not approve the call, does not set YOLO, and does not skip the prompt. `post_approval_response` records a fresh human yes (`once`, `session`, or `always` on that prompt). The handler sends the request only after it consumes that record. A session or always answer does not cover the next write. Smart (model) approval, YOLO, approvals off, cron, and a skipped prompt do not count. `{"action": "block"}` refuses unattended cron, a spend cap exceeded before the prompt, and `/zaprite kill`. A denial, a cron run, or a missing yes sends nothing.
-- **Fees.** Orders this plugin creates are API orders. On those, Zaprite's fee applies to bitcoin (on-chain, Lightning, Liquid) and Tether: 1%, cap $15 per transaction. Card and bank use the merchant's own processor; Zaprite adds no fee on fiat. Dashboard-created invoices, payment links, POS, and payment requests have no Zaprite transaction fee. Event ticket issue carries the ticket product fee (1% + $3 per ticket). Plans are $25/month or $240/year, credited against fees.
-- **Rails.** Only rails a person already connected appear. There is no connections API. Doctor says that every time.
+In `zaprite_pay`, write the amount the way a person says it: `$1,280`, `1280 usd`, `0.05 BTC`.
+It echoes back what it understood. On `zaprite_create_order` and `zaprite_create_invoice`,
+amounts stay integers in the smallest unit — `128000` USD is $1,280.00, and Bitcoin is sats.
 
-## When to use it
+`external_uniq_id` is the idempotency key Zaprite gives order creation. Reusing it returns the stored order instead of a second checkout.
 
-- Invoice a customer and hand them a checkout link.
-- Watch that order until Paid without opening the dashboard.
-- Quote Lightning or on-chain bitcoin for the same order, in chat.
-- Charge a payment profile the customer already saved.
-- See overdue invoices and a short status report.
-- Check in a ticket for an event that already exists.
+`send_receipt` defaults to false in this plugin. The API default is true. Set it true only when a person asked to email the customer.
 
-## When not to use it
+API orders show in the Zaprite dashboard after the first payment, not when you create them.
 
-- The agent is the one paying. This plugin is receive-side. A paying agent may settle a `lightning:` or `bitcoin:` URL only when a person asked it to pay.
-- You need a new organization, a new API key, a new rail, a checkout discount, a logo or accent color, to **create** a payment link, a recurring invoice, an event, or a refund. Those writes are not in the API. Listing an existing payment link is fine. A person does the one dashboard step. `zaprite_bridge_handoff` records it and does not drive a browser. A logo or color uses gap `branding_profile` (Settings → Profile).
-- The org has not connected a rail. Checkout only offers what is already connected.
-
-`requires_hermes` is `>=0.21.0` for manifest v2, `register_skill`, `plugin_db`, and the human-approval directive. `ask_choice` and `current_cron_execution` are used when that Hermes has them. Python: `httpx>=0.27,<0.29`. Tests: `pip install "httpx>=0.27,<0.29" "pytest>=8.2,<10" && pytest`.
+`zaprite_create_quote` is the in-chat Lightning or on-chain quote (`paymentUrl`). Card, bank, and stablecoins stay on `checkoutUrl`.
 
 ## One human setup
 
@@ -109,29 +101,45 @@ Do this once per organization. The agent cannot do it. Context first every sessi
 
 `hermes zaprite status`, `hermes zaprite doctor`, `hermes zaprite kill`, `hermes zaprite pause`, and `hermes zaprite resume` do the same from a terminal.
 
-## The Paid loop
+## Disclosures
 
-1. `zaprite_doctor` if you have not checked the key.
-2. `zaprite_pay` — one call. Give it a description, the amount, and a name and email. It
-   finds or creates the customer, creates the invoice, and returns one link. Use `as="order"`
-   for a link anyone can pay.
-3. Need line items or a custom invoice? `zaprite_create_contact` (`legal_name`, `email`)
-   then `zaprite_create_invoice`.
-4. Send `checkoutUrl` to the payer. Say the `session_notice` in this chat. Telegram is not required.
-5. `zaprite_watch_order` re-fetches until `PAID`, `OVERPAID`, or `COMPLETE`, or until the timeout (default 25s, max 90s). Call it again to keep waiting.
-6. Deliver the work. `zaprite_update_order` with `status` `COMPLETE` is Mark as complete. It is not a refund.
+What you are installing:
 
-In `zaprite_pay`, write the amount the way a person says it: `$1,280`, `1280 usd`, `0.05 BTC`.
-It echoes back what it understood. On `zaprite_create_order` and `zaprite_create_invoice`,
-amounts stay integers in the smallest unit — `128000` USD is $1,280.00, and Bitcoin is sats.
+- **Network.** Calls `https://api.zaprite.com` with the org API key. User-Agent `zaprite-hermes/0.1.0`. No other host. No telemetry.
+- **Money movement.** A full-access key can open real checkouts. Customers can pay them. `zaprite_charge_profile` charges a payment profile the customer already saved.
+- **Email.** Receipts and ticket emails stay off unless you set the flag. The Zaprite API defaults receipts to on. This plugin sends `false` unless you ask.
+- **Tickets.** Issuing tickets can incur Zaprite's standard ticket fee (1% + $3 per ticket on that product).
+- **Mark complete.** `zaprite_update_order` can set `COMPLETE` or an expiry. It cannot set `PAID`: payment status comes from Zaprite, and cash is recorded in the dashboard. It cannot refund.
+- **Webhooks.** Payloads are id-only and unsigned (`{eventType, orderId, orgId}`). There is no signature. Every watch and get re-fetches the order and says so. This plugin does not run a webhook server. `zaprite_create_webhook` can register your own HTTPS URL; payloads stay unsigned.
+- **Local ledger.** Orders this plugin creates sit in Hermes `plugin_db("zaprite")`. The API key is not stored there.
+- **Dashboard handoff.** One URL and a note for a gap the API cannot write (a Lightning discount, or Settings → Profile for a logo and accent color). No browser, no clicking.
+- **Branding.** Logo, accent color, and display name are dashboard Profile inheritance only. API-created invoices and checkouts inherit them. This plugin cannot read or write branding.
+- **Approvals.** `pre_tool_call` may return `{"action": "approve"}` with a one-time `rule_key`. That **escalates to the Hermes human gate**. It does not approve the call, does not set YOLO, and does not skip the prompt. `post_approval_response` records a fresh human yes (`once`, `session`, or `always` on that prompt). The handler sends the request only after it consumes that record. A session or always answer does not cover the next write. Smart (model) approval, YOLO, approvals off, cron, and a skipped prompt do not count. `{"action": "block"}` refuses unattended cron, a spend cap exceeded before the prompt, and `/zaprite kill`. A denial, a cron run, or a missing yes sends nothing.
+- **Fees.** Orders this plugin creates are API orders. On those, Zaprite's fee applies to bitcoin (on-chain, Lightning, Liquid) and Tether: 1%, cap $15 per transaction. Card and bank use the merchant's own processor; Zaprite adds no fee on fiat. Dashboard-created invoices, payment links, POS, and payment requests have no Zaprite transaction fee. Event ticket issue carries the ticket product fee (1% + $3 per ticket). Plans are $25/month or $240/year, credited against fees.
+- **Rails.** Only rails a person already connected appear. There is no connections API. Doctor says that every time.
 
-`external_uniq_id` is the idempotency key Zaprite gives order creation. Reusing it returns the stored order instead of a second checkout.
+## Before any real payment
 
-`send_receipt` defaults to false in this plugin. The API default is true. Set it true only when a person asked to email the customer.
+- **Sandbox first.** A sandbox organization takes test payments and moves no real money. A live organization opens real checkouts. The plugin cannot switch orgs for you: paste the key for the org you mean. https://help.zaprite.com/en/articles/9987875-what-is-a-sandbox-environment · https://help.zaprite.com/en/articles/9875022-how-to-test-payments-for-an-api-integration
+- **Unsigned webhooks.** A delivery is ids only, `{eventType, orderId, orgId}`, and it has no signature. Re-fetch the order. A webhook is not a payment.
+- **API ceilings.** There is no API to create a recurring invoice, a payment link, a POS terminal, an event, or a refund. Logo, accent color, and display name are not an API write. A person sets them in Settings → Profile. `zaprite_bridge_handoff` with gap `branding_profile` opens that page. It does not send a logo or a color to Connections or Checkouts. The full list is [`docs/api-gaps.md`](docs/api-gaps.md).
 
-API orders show in the Zaprite dashboard after the first payment, not when you create them.
+## When to use it
 
-`zaprite_create_quote` is the in-chat Lightning or on-chain quote (`paymentUrl`). Card, bank, and stablecoins stay on `checkoutUrl`.
+- Invoice a customer and hand them a checkout link.
+- Watch that order until Paid without opening the dashboard.
+- Quote Lightning or on-chain bitcoin for the same order, in chat.
+- Charge a payment profile the customer already saved.
+- See overdue invoices and a short status report.
+- Check in a ticket for an event that already exists.
+
+## When not to use it
+
+- The agent is the one paying. This plugin is receive-side. A paying agent may settle a `lightning:` or `bitcoin:` URL only when a person asked it to pay.
+- You need a new organization, a new API key, a new rail, a checkout discount, a logo or accent color, to **create** a payment link, a recurring invoice, an event, or a refund. Those writes are not in the API. Listing an existing payment link is fine. A person does the one dashboard step. `zaprite_bridge_handoff` records it and does not drive a browser. A logo or color uses gap `branding_profile` (Settings → Profile).
+- The org has not connected a rail. Checkout only offers what is already connected.
+
+`requires_hermes` is `>=0.21.0` for manifest v2, `register_skill`, `plugin_db`, and the human-approval directive. `ask_choice` and `current_cron_execution` are used when that Hermes has them. Python: `httpx>=0.27,<0.29`. Tests: `pip install "httpx>=0.27,<0.29" "pytest>=8.2,<10" && pytest`.
 
 ## Settings
 

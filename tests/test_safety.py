@@ -220,7 +220,11 @@ def test_docs_name_the_pause_command_and_the_gaps():
     root = Path(__file__).resolve().parents[1]
     readme = (root / "README.md").read_text(encoding="utf-8")
     setup = (root / "setup.md").read_text(encoding="utf-8")
-    assert "hermes plugins install welliv/zaprite-hermes --ref " in readme
+    # The install line must name the repo the catalog entry names, so a rename
+    # cannot leave the docs pointing at a repository that no longer exists.
+    catalog = (root / "catalog" / "zaprite.yaml").read_text(encoding="utf-8")
+    repo = next(line.split("https://github.com/", 1)[1].strip() for line in catalog.splitlines() if line.startswith("repo: https://github.com/"))
+    assert f"hermes plugins install {repo} --ref " in readme
     assert "--yes-deps --enable" in readme
     assert "/zaprite kill" in readme
     assert "docs/api-gaps.md" in readme

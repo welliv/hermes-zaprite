@@ -6,7 +6,7 @@ Thanks for looking. This plugin talks to a payments API, so the bar for changes 
 ## Get set up
 
 ```bash
-git clone https://github.com/welliv/zaprite-hermes
+git clone https://github.com/welliv/hermes-zaprite
 cd zaprite-hermes
 pip install "httpx>=0.27,<0.29" "pytest>=8.2,<10"
 pytest -q
