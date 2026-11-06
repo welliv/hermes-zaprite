@@ -46,13 +46,13 @@ For a live walkthrough, the demo storefront is our own PlugnStay org. No keys or
 Hermes `>=0.21.0`. Preferred, from the release-tree commit (the 40-character sha in `catalog/zaprite.yaml`, not a later commit that only edits the pin):
 
 ```bash
-hermes plugins install welliv/hermes-zaprite --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable
+hermes plugins install welliv/hermes-zaprite --ref 6373877b3b84815a65b2fb42c0a89fc2e082c750 --yes-deps --enable
 ```
 
 Add `--force` when replacing a copy that is already installed:
 
 ```bash
-hermes plugins install welliv/hermes-zaprite --ref af7b7554b1fa8b25827af5ba9d242d737094a2a8 --yes-deps --enable --force
+hermes plugins install welliv/hermes-zaprite --ref 6373877b3b84815a65b2fb42c0a89fc2e082c750 --yes-deps --enable --force
 ```
 
 From a local checkout while developing:
@@ -187,7 +187,7 @@ hermes plugins doctor . --ci
 
 ## Catalog
 
-`catalog/zaprite.yaml` is the entry for `NousResearch/hermes-agent` `plugin-catalog/zaprite.yaml`. `repo`, `docs_url`, and the manifest homepage are `https://github.com/welliv/hermes-zaprite`. `sha` is `af7b7554b1fa8b25827af5ba9d242d737094a2a8`, the commit that landed this tree on `main`. `requires_hermes` is `>=0.21.0`. Instructions are in `catalog/PIN.md`.
+`catalog/zaprite.yaml` is the entry for `NousResearch/hermes-agent` `plugin-catalog/zaprite.yaml`. `repo`, `docs_url`, and the manifest homepage are `https://github.com/welliv/hermes-zaprite`. `sha` is `6373877b3b84815a65b2fb42c0a89fc2e082c750`, the commit that landed this tree on `main`. `requires_hermes` is `>=0.21.0`. Instructions are in `catalog/PIN.md`.
 
 ## Known gaps
 
