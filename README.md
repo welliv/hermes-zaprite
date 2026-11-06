@@ -12,9 +12,21 @@ Agent-to-agent settlement is a ~10s closer. The merchant Paid loop above is the 
 
 Below: sandbox first, unsigned webhooks, API ceilings, dual-hook approval, `/zaprite kill`.
 
+## Why this
+
+Zaprite already put every rail in one account. This plugin puts every merchant act in one conversation.
+
+The keyboard we remove is the fixed dashboard click-path — and single-rail tooling that only speaks one payment grammar. The soft keyboard is tools that appear for *this* job: invoice, checkout, watch until **Paid**, overdue — without Zaprite having drawn that screen.
+
+Intent is the finger. Computer-use poking a dashboard is the stylus: it works, but it's transitional. API-native tools plus human approval are the multi-touch layer.
+
+Checkout only offers rails this org already connected — card, bank, Lightning, on-chain bitcoin, and stablecoins when those are connected. A person still does identity, Connections, and Profile once. The agent does the repeatable loop.
+
+Say **every rail, not one**. Agent-to-agent settlement stays a ~10s closer; the merchant Paid loop is the product.
+
 ## Quickstart
 
-Chat does orders, invoices, contacts, ticket issue, and reports. The dashboard does connections, Profile branding, recurring invoices, payment-link create, POS create, event create, and refunds.
+Chat runs the Paid loop. A person still uses the dashboard once for Connections, Settings → Profile (logo/color), and anything with no API (recurring create, payment-link create, POS, events, refunds).
 
 Say one of these:
 
@@ -26,6 +38,8 @@ Say one of these:
 - **Add my logo.** `Add my logo.` Hermes calls `zaprite_bridge_handoff` with gap `branding_profile` and opens Settings → Profile. It cannot set the logo or the accent color. Invoices and checkouts inherit Profile after you save it. Then open a `checkoutUrl` to preview. Guide: https://blog.zaprite.com/introducing-branded-invoices-and-checkouts/
 
 The Paid loop below is the path. Tickets and the open-rail closer stay later in this file.
+
+For a live walkthrough, the demo storefront is our own PlugnStay org. No keys or org data live in this repo.
 
 ## Install
 
@@ -61,8 +75,8 @@ Restart the session. Hermes asks for the key: sign in or sign up at https://app.
 3. Need line items or a custom invoice? `zaprite_create_contact` (`legal_name`, `email`)
    then `zaprite_create_invoice`.
 4. Send `checkoutUrl` to the payer. Say the `session_notice` in this chat. Telegram is not required.
-5. `zaprite_watch_order` re-fetches until `PAID`, `OVERPAID`, or `COMPLETE`, or until the timeout (default 25s, max 90s). Call it again to keep waiting.
-6. Deliver the work. `zaprite_update_order` with `status` `COMPLETE` is Mark as complete. It is not a refund.
+5. `zaprite_watch_order` re-fetches until `PAID` or `OVERPAID`, or until the timeout (default 25s, max 90s). Call it again to keep waiting.
+6. Deliver the work. `zaprite_update_order` with status `COMPLETE` marks merchant work done. It does **not** mean money arrived. Payment truth is only a re-fetched order status (`PAID` / `OVERPAID`). The agent cannot declare payment.
 
 In `zaprite_pay`, write the amount the way a person says it: `$1,280`, `1280 usd`, `0.05 BTC`.
 It echoes back what it understood. On `zaprite_create_order` and `zaprite_create_invoice`,
@@ -83,7 +97,7 @@ Do this once per organization. The agent cannot do it. Context first every sessi
 1. Sign in or sign up at https://app.zaprite.com. Open a sandbox org for test payments (no real money) or a live org for real checkouts: https://help.zaprite.com/en/articles/9987875-what-is-a-sandbox-environment · https://help.zaprite.com/en/articles/9875022-how-to-test-payments-for-an-api-integration
 2. Connect the rails you want. Only those rails appear on checkout. There is no API to list or add them. Help (no org slug): https://help.zaprite.com/en/collections/9686374-connections. After doctor has seen an `orgId`, use its `deep_links.connections` (`/org/{orgId}/…`). Until then do not guess a slug if `/org/default/` 404s — use the org switcher in the app.
 3. Create an API key from doctor’s `deep_links.api_keys` (Settings → API).
-4. Give the key to Hermes when it asks for `ZAPRITE_API_KEY`. Do not paste it into the chat.
+4. Give the key to Hermes through **Tools → Zaprite**. Never paste it into the chat.
 5. Set the logo, accent color, and display name in Settings → Profile (doctor’s `deep_links.profile`). API-created invoices and checkouts inherit them. This plugin cannot set a logo or a color. After you save Profile, open a `checkoutUrl` to preview. Guide: https://blog.zaprite.com/introducing-branded-invoices-and-checkouts/
 6. Say: "Invoice Northwind 1280 USD for the March retainer." Share the `checkoutUrl` with the customer — the API may mark an invoice SENT but does not reliably email it.
 
