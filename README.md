@@ -76,7 +76,7 @@ Restart the session. Hermes asks for the key: sign in or sign up at https://app.
    then `zaprite_create_invoice`.
 4. Send `checkoutUrl` to the payer. Say the `session_notice` in this chat. Telegram is not required.
 5. `zaprite_watch_order` re-fetches until `PAID` or `OVERPAID`, or until the timeout (default 25s, max 90s). Call it again to keep waiting.
-6. Deliver the work. `zaprite_update_order` with status `COMPLETE` marks merchant work done. It does **not** mean money arrived. Payment truth is only a re-fetched order status (`PAID` / `OVERPAID`). The agent cannot declare payment.
+6. Deliver the work. `zaprite_update_order` with status `COMPLETE` marks merchant work done. It does **not** mean money arrived. Payment truth is a re-fetched order: status `PAID` / `OVERPAID`, or settled transactions that cover the total. A partial payment is not paid. The agent cannot declare payment. The agent cannot declare payment.
 
 In `zaprite_pay`, write the amount the way a person says it: `$1,280`, `1280 usd`, `0.05 BTC`.
 It echoes back what it understood. On `zaprite_create_order` and `zaprite_create_invoice`,
