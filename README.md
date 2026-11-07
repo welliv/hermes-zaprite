@@ -2,6 +2,10 @@
 
 Take payments from a chat. One link for every rail the merchant's Zaprite account already connected — card, bank, bitcoin, Lightning, stablecoins — and the agent keeps checking until the money is actually there.
 
+[![The 48-second demo: a live shop, a $1 payment, and the approval gate before any write](docs/demo-poster.png)](https://github.com/welliv/hermes-zaprite/releases/download/demo-v1/zaprite-demo.mp4)
+
+▶ **[48-second demo](https://github.com/welliv/hermes-zaprite/releases/download/demo-v1/zaprite-demo.mp4)** — a real storefront, a real $1 checkout across six rails, then the agent refusing to send a duplicate invoice and stopping for a human yes before it writes.
+
 ## What it does
 
 - **Get paid in one call.** `zaprite_pay` finds or creates the customer, raises the invoice, and returns a single `checkoutUrl`. Say the amount the way a person does: `Invoice Northwind 1,280 USD for the March retainer.`
