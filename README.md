@@ -29,7 +29,7 @@ This plugin closes that loop. The merchant's work happens where the work happens
 Hermes `>=0.21.0`. Install at the release-tree commit (the 40-character sha in `catalog/zaprite.yaml`, not a later commit that only edits the pin):
 
 ```bash
-hermes plugins install welliv/hermes-zaprite --ref adb4c95e41c2198d89ed62bca6f6ee5b9aaebf81 --yes-deps --enable
+hermes plugins install welliv/hermes-zaprite --ref 79d85cbcc3a4b8c82d8036ff7b6bec9b71eed57f --yes-deps --enable
 ```
 
 Add `--force` to replace a copy that is already installed. From a local checkout:
@@ -120,7 +120,7 @@ hermes plugins doctor . --ci
 
 ## Catalog
 
-`catalog/zaprite.yaml` is the entry for `NousResearch/hermes-agent` → `plugin-catalog/zaprite.yaml`. `sha` is `adb4c95e41c2198d89ed62bca6f6ee5b9aaebf81`, the commit that landed this tree on `main`; re-pin instructions are in `catalog/PIN.md`.
+`catalog/zaprite.yaml` is the entry for `NousResearch/hermes-agent` → `plugin-catalog/zaprite.yaml`. `sha` is `79d85cbcc3a4b8c82d8036ff7b6bec9b71eed57f`, the commit that landed this tree on `main`; re-pin instructions are in `catalog/PIN.md`.
 
 ## Layout
 
