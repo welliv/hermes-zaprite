@@ -4,7 +4,7 @@ Take payments from a chat. One link for every rail the merchant's Zaprite accoun
 
 ![The demo: a real $1 checkout across six rails, then the agent asking for approval before it writes](docs/demo.gif)
 
-▶ **[Watch it with sound](https://github.com/welliv/hermes-zaprite/releases/download/demo-v1/zaprite-demo.mp4)** — 48 seconds: a real storefront, a real $1 payment, then the agent refusing to send a duplicate invoice and stopping for a human yes before it writes.
+▶ **[Watch it with sound](https://welliv.github.io/hermes-zaprite/demo.html)** — 48 seconds: a real storefront, a real $1 payment, then the agent refusing to send a duplicate invoice and stopping for a human yes before it writes.
 
 ## What it does
 

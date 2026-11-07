@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zaprite for Hermes — 48-second demo</title>
+<style>
+  :root { color-scheme: dark; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0B0B0D; color: #F5F2EC; min-height: 100vh;
+    display: grid; place-items: center; padding: 32px 20px;
+    font: 400 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  main { width: min(1120px, 100%); }
+  header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-size: clamp(20px, 3vw, 28px); font-weight: 600; letter-spacing: -0.02em; }
+  .kicker { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #8EE0A6; }
+  video {
+    width: 100%; border-radius: 10px; background: #000; display: block;
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
+  }
+  p { color: #A8A39A; font-size: 14.5px; margin-top: 16px; max-width: 70ch; }
+  a { color: #8EE0A6; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { color: #F5F2EC; background: #17171A; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+</style>
+<main>
+  <header>
+    <span class="kicker">Hermes plugin · Zaprite</span>
+    <h1>Take payments from a chat</h1>
+  </header>
+  <video controls autoplay muted playsinline poster="demo-poster.png"
+         src="https://github.com/welliv/hermes-zaprite/releases/download/demo-v1/zaprite-demo.mp4"></video>
+  <p>
+    A real storefront, a real $1 checkout across six rails, then the agent refusing to send a
+    duplicate invoice and stopping for a human yes before it writes. Every frame is a live session.
+  </p>
+  <p>
+    Install: <code>hermes plugins install zaprite</code> ·
+    <a href="https://github.com/welliv/hermes-zaprite">Repository</a> ·
+    <a href="https://hackathon.plugnstay.supplies/zaprite-test">Try the $1 checkout</a>
+  </p>
+</main>
+</html>
