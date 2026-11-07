@@ -201,7 +201,8 @@ SCHEMAS = {
             "contact_id": {"type": "string"},
             "status": {
                 "type": "string",
-                "description": "PENDING, PROCESSING, PAID, OVERPAID, UNDERPAID, COMPLETE, or ABANDONED.",
+                "description": ("PENDING, PROCESSING, PAID, OVERPAID, UNDERPAID or COMPLETE. "
+                               "PROCESSING means a payment was seen but has not confirmed yet."),
             },
             "type": {
                 "type": "string",
@@ -254,9 +255,10 @@ SCHEMAS = {
     "zaprite_update_order": _tool(
         "zaprite_update_order",
         (
-            "Mark an order COMPLETE after you deliver, or set expires_at. It cannot set PAID: payment "
-            "status comes from Zaprite when money arrives, and a person records cash in the dashboard. "
-            "Does not refund or edit line items. Needs approval. Fails closed in cron."
+            "Mark an order COMPLETE after you deliver, or set expires_at. Zaprite's API also accepts "
+            "PAID here, but this tool refuses it: only money arriving may mark an order paid, and a "
+            "person records cash in the dashboard. Does not refund or edit line items. Needs approval. "
+            "Fails closed in cron."
         ),
         {
             "order_id": _ORDER_ID,

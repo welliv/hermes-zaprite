@@ -758,7 +758,8 @@ def update_order(args: dict, **kwargs: Any) -> dict:
         "ok": True,
         "order": view,
         "session_notice": _notice(notice),
-        "note": "PATCH only sets COMPLETE or expiresAt. It cannot set PAID. It does not refund, void an invoice, or edit line items.",
+        "note": ("PATCH sets COMPLETE or expiresAt. Zaprite also accepts PAID, but this plugin refuses it: "
+                     "a merchant cannot declare payment. It does not refund, void an invoice, or edit line items."),
     }
     payload.update(_session(kwargs))
     return payload
