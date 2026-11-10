@@ -2,11 +2,9 @@
 
 Take payments from a chat. One link for every rail the merchant's Zaprite account already connected — card, bank, bitcoin, Lightning, stablecoins — and the agent keeps checking until the money is actually there.
 
-![The demo: a real $1 checkout across six rails, then the agent asking for approval before it writes](docs/demo.gif)
+![The demo: an invoice raised under approval, then the agent refusing to mark it paid](docs/demo-86.gif)
 
-▶ **[Watch it with sound](https://welliv.github.io/hermes-zaprite/demo.html)** — 48 seconds: a real storefront, a real $1 payment, then the agent refusing to send a duplicate invoice and stopping for a human yes before it writes.
-
-▶ **[The 86-second cut](https://welliv.github.io/hermes-zaprite/demo-86.html)** — narrated: an invoice raised under approval, the agent refusing to mark it paid, and one checkout link with seven ways to pay.
+▶ **[Watch the 86-second narrated demo](https://welliv.github.io/hermes-zaprite/demo-86.html)** — an invoice raised from chat, a human approval before the write, the agent refusing to mark an order paid, and one link with seven ways to pay.
 
 ## What it does
 
