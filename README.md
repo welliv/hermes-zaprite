@@ -6,10 +6,12 @@ Take payments from a chat. One link for every rail the merchant's Zaprite accoun
 
 ▶ **[Watch it with sound](https://welliv.github.io/hermes-zaprite/demo.html)** — 48 seconds: a real storefront, a real $1 payment, then the agent refusing to send a duplicate invoice and stopping for a human yes before it writes.
 
+▶ **[The 86-second cut](https://welliv.github.io/hermes-zaprite/demo-86.html)** — narrated: an invoice raised under approval, the agent refusing to mark it paid, and one checkout link with seven ways to pay.
+
 ## What it does
 
 - **Get paid in one call.** `zaprite_pay` finds or creates the customer, raises the invoice, and returns a single `checkoutUrl`. Say the amount the way a person does: `Invoice Northwind 1,280 USD for the March retainer.`
-- **Every rail, one link.** The payer picks card, bank transfer, bitcoin, Lightning, USDC or USDT on Zaprite's page. The plugin lists no rails and builds no payment form of its own.
+- **Every rail, one link.** The payer picks card, bank transfer, bitcoin, Lightning, USDC or USDT on Zaprite's page — seven ways to pay, counting cash recorded in the dashboard. The plugin lists no rails and builds no payment form of its own.
 - **Waits for real money.** `zaprite_watch_order` re-fetches until the order is `PAID` or `OVERPAID`. A partial payment is not paid, and no tool can declare one.
 - **Keeps the books.** Recent orders, overdue invoices, a short report, and a live health check — without opening a dashboard.
 - **The rest of the API.** Contacts, Lightning and on-chain quotes, payment links, event tickets (list, issue, check in), and webhooks you own.
